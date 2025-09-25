@@ -1,8 +1,6 @@
 // src/components/LibraryPanel.jsx
-
 import React from 'react';
 
-// This component receives the library items and functions to add/close
 export const LibraryPanel = ({ library, onAddModel, onClose }) => {
   return (
     <div className="library-panel">

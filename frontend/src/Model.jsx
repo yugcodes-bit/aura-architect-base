@@ -1,40 +1,52 @@
 // src/Model.jsx
 
 import { useGLTF } from '@react-three/drei';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 export function Model({ modelData, setSelectedObject }) {
   const { scene } = useGLTF(modelData.models.file_url);
+  const groupRef = useRef();
 
   const clonedScene = useMemo(() => {
     const cloned = scene.clone();
-    cloned.position.set(modelData.position[0], modelData.position[1], modelData.position[2]);
-    cloned.rotation.set(modelData.rotation[0], modelData.rotation[1], modelData.rotation[2]);
-    cloned.scale.set(modelData.scale, modelData.scale, modelData.scale);
     cloned.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
       }
     });
-    cloned.userData.instanceId = modelData.instanceId;
     return cloned;
-  }, [scene, modelData]);
+  }, [scene]);
 
   return (
-    <primitive
-      object={clonedScene}
+    <group
+      ref={groupRef}
+      position={modelData.position}
+      rotation={modelData.rotation}
+      scale={modelData.scale}
+      userData={{
+        instanceId: modelData.instanceId,
+        category: modelData.models.category,
+      }}
       onClick={(e) => {
         e.stopPropagation();
-        // --- THIS IS THE NEW LOGIC ---
-        // If the model's category is 'room_base', deselect everything.
-        // Otherwise, select the object that was clicked.
         if (modelData.models.category === 'room_base') {
           setSelectedObject(null);
         } else {
-          setSelectedObject(clonedScene);
+          setSelectedObject(groupRef.current);
         }
       }}
-    />
+    >
+      <primitive object={clonedScene} />
+      {modelData.models.category === 'lamp' && (
+        <pointLight
+          color={"#FFDDB3"}
+          intensity={10}
+          distance={7}
+          decay={2}
+          castShadow
+        />
+      )}
+    </group>
   );
 }

@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom';
 import background_video from '../assets/landing_page_vid.mp4';
 import { Scene } from '../Scene.jsx';
 import { supabase } from '../supabaseClient';
-import { LibraryPanel } from '../components/LibraryPanel';  
+import { LibraryPanel } from '../components/LibraryPanel';
 
-// ... Typewriter component (no changes) ...
 const sentences = [ "Imagine your dream space...", "What room shall we design today?", ];
-const Typewriter = () => { /* ... No changes here ... */
+const Typewriter = () => {
     const [text, setText] = useState('');
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const [charIndex, setCharIndex] = useState(0);
@@ -29,19 +28,17 @@ const Typewriter = () => { /* ... No changes here ... */
                     setText(currentSentence.substring(0, charIndex + 1));
                     setCharIndex((prev) => prev + 1);
                 } else {
-                    setTimeout(() => setIsDeleting(true), 5000);
+                    setTimeout(() => setIsDeleting(true), 2500);
                 }
             }
         };
-        const timeout = setTimeout(handleTyping, isDeleting ? 20 : 20);
-        return () => clearTimeout(timeout);
+        const timeoutId = setTimeout(handleTyping, isDeleting ? 40 : 80);
+        return () => clearTimeout(timeoutId);
     }, [charIndex, isDeleting, sentenceIndex]);
     return <p className="typewriter-text">{text}</p>;
 };
 
-
 const Create = () => {
-    // ... State and useEffect ... (no changes)
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -51,7 +48,7 @@ const Create = () => {
     const [selectedObject, setSelectedObject] = useState(null);
     const [isLibraryOpen, setLibraryOpen] = useState(false);
 
-    useEffect(() => { /* ... No changes to this useEffect ... */
+    useEffect(() => {
         const fetchLibrary = async () => {
             const { data, error } = await supabase.from('models').select('*').neq('category', 'room_base');
             if (error) console.error("Error fetching furniture library:", error);
@@ -59,13 +56,11 @@ const Create = () => {
         };
         fetchLibrary();
     }, []);
-    
-    // --- NEW FUNCTION TO UPDATE A MODEL'S TRANSFORM ---
+
     const updateModelTransform = (instanceId, newPosition, newRotation, newScale) => {
         setModels(currentModels =>
             currentModels.map(model => {
                 if (model.instanceId === instanceId) {
-                    // Return a new object with updated properties
                     return { ...model, position: newPosition, rotation: newRotation, scale: newScale };
                 }
                 return model;
@@ -73,8 +68,7 @@ const Create = () => {
         );
     };
 
-    // ... handleSendMessage, processAiResponse, etc. (no changes) ...
-    const getPositionFromPlacement = (placement) => { /* ... No changes here ... */
+    const getPositionFromPlacement = (placement) => {
         const roomBoundary = 3.5;
         switch (placement) {
             case "center": return [0, 0, 0];
@@ -87,7 +81,8 @@ const Create = () => {
             default: return [0, 0, 0];
         }
     };
-    const processAiResponse = async (aiResponse) => { /* ... No changes here ... */
+    
+    const processAiResponse = async (aiResponse) => {
         const sceneModels = [];
         const { data: roomData, error: roomError } = await supabase.from('models').select('file_url, category').eq('category', 'room_base').limit(1).single();
         if (roomError) {
@@ -128,7 +123,8 @@ const Create = () => {
         }
         setModels(sceneModels);
     };
-    const handleSendMessage = async (e) => { /* ... No changes here ... */
+
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         const userPrompt = inputValue.trim().toLowerCase();
         if (!userPrompt) return;
@@ -157,7 +153,8 @@ const Create = () => {
             }
         }
     };
-    const addModelToScene = (item) => { /* ... No changes here ... */
+
+    const addModelToScene = (item) => {
         const newModel = {
             instanceId: Date.now(),
             position: [0, 0.5, 0],
@@ -166,13 +163,17 @@ const Create = () => {
             models: { file_url: item.file_url, category: item.category }
         };
         setModels(prevModels => [...prevModels, newModel]);
-        if (!hasMessages) setMessages([{ text: 'Starting design...', sender: 'system' }]);
+        if (!messages.length > 0) {
+            setMessages([{ text: 'Starting design...', sender: 'system' }]);
+        }
     };
-    const deleteSelectedModel = () => { /* ... No changes here ... */
+
+    const deleteSelectedModel = () => {
         if (!selectedObject) return;
         setModels(models.filter(model => model.instanceId !== selectedObject.userData.instanceId));
         setSelectedObject(null);
     };
+
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
     const hasMessages = messages.length > 0;
     
@@ -212,7 +213,6 @@ const Create = () => {
                                     )}
                                 </div>
                                 <div className="scene-viewport">
-                                    {/* PASS THE NEW FUNCTION DOWN TO THE SCENE */}
                                     <Scene 
                                         models={models} 
                                         transformMode={transformMode} 
@@ -239,5 +239,4 @@ const Create = () => {
         </div>
     );
 };
-
 export default Create;
