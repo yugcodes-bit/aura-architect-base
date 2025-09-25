@@ -11,6 +11,10 @@ import lamp from "../assets/furn_lamp.png";
 import table from "../assets/furn_table.png";
 import chair2 from "../assets/furn_chair2.png";
 import drawer from "../assets/furn_drawer.png";
+import Team from "./Team"
+import one from "../assets/one.png"
+import two from "../assets/two.png"
+import three from "../assets/three.png"
 
 const Home = () => {
     const [isFixed, setIsFixed] = useState(true);
@@ -60,10 +64,12 @@ const Home = () => {
     <img className='chair2' src={chair2} alt="Chair2" />
     <img className='drawer' src={drawer} alt="Drawer" />
     <div className='tutorial'>
-
+      <img id='one' src={one} alt="" />
+      <img id='two' src={two} alt="" />
+      <img id='three' src={three} alt="" />
     </div>
       <div className='team'> 
-
+      <Team />
       </div>
       <div className='end'>
 <div className='bg-video-end'>
