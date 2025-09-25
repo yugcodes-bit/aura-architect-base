@@ -47,6 +47,7 @@ const Create = () => {
     const [furnitureLibrary, setFurnitureLibrary] = useState([]);
     const [selectedObject, setSelectedObject] = useState(null);
     const [isLibraryOpen, setLibraryOpen] = useState(false);
+    const [lightIntensity, setLightIntensity] = useState(10);
 
     useEffect(() => {
         const fetchLibrary = async () => {
@@ -67,7 +68,7 @@ const Create = () => {
             })
         );
     };
-
+    
     const getPositionFromPlacement = (placement) => {
         const roomBoundary = 3.5;
         switch (placement) {
@@ -81,7 +82,6 @@ const Create = () => {
             default: return [0, 0, 0];
         }
     };
-    
     const processAiResponse = async (aiResponse) => {
         const sceneModels = [];
         const { data: roomData, error: roomError } = await supabase.from('models').select('file_url, category').eq('category', 'room_base').limit(1).single();
@@ -123,7 +123,6 @@ const Create = () => {
         }
         setModels(sceneModels);
     };
-
     const handleSendMessage = async (e) => {
         e.preventDefault();
         const userPrompt = inputValue.trim().toLowerCase();
@@ -153,7 +152,6 @@ const Create = () => {
             }
         }
     };
-
     const addModelToScene = (item) => {
         const newModel = {
             instanceId: Date.now(),
@@ -167,7 +165,6 @@ const Create = () => {
             setMessages([{ text: 'Starting design...', sender: 'system' }]);
         }
     };
-
     const deleteSelectedModel = () => {
         if (!selectedObject) return;
         setModels(models.filter(model => model.instanceId !== selectedObject.userData.instanceId));
@@ -176,7 +173,7 @@ const Create = () => {
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
     const hasMessages = messages.length > 0;
-    
+
     return (
         <div className="create-page">
             <video autoPlay loop muted className="create-page-bg-video" src={background_video} />
@@ -212,6 +209,17 @@ const Create = () => {
                                         <button onClick={deleteSelectedModel} className="delete-button">Delete</button>
                                     )}
                                 </div>
+                                {selectedObject?.userData?.isLamp && (
+                                    <div className="light-controls-ui">
+                                        <label>Light Intensity</label>
+                                        <input 
+                                            type="range" min="0" max="50" step="1"
+                                            value={lightIntensity}
+                                            onChange={(e) => setLightIntensity(Number(e.target.value))}
+                                        />
+                                    </div>
+                                )}
+
                                 <div className="scene-viewport">
                                     <Scene 
                                         models={models} 
@@ -219,6 +227,8 @@ const Create = () => {
                                         selectedObject={selectedObject} 
                                         setSelectedObject={setSelectedObject}
                                         onTransformEnd={updateModelTransform}
+                                        lightIntensity={lightIntensity} // Pass intensity to the scene
+
                                     />
                                 </div>
                             </div>
@@ -239,4 +249,4 @@ const Create = () => {
         </div>
     );
 };
-export default Create;
+export default Create;      

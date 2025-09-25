@@ -2,14 +2,16 @@
 import { create } from 'zustand';
 
 export const useStore = create((set) => ({
-  // State
+  // STATE
   models: [],
   selectedObject: null,
   transformMode: 'translate',
+  lightIntensity: 10,
 
-  // Actions
-  setModels: (newModels) => set({ models: newModels }),
+  // ACTIONS
+  setModels: (newModels) => set({ models: newModels, selectedObject: null }),
   addModel: (newModel) => set((state) => ({ models: [...state.models, newModel] })),
+  
   deleteSelectedObject: () => set((state) => {
     if (!state.selectedObject) return state;
     return {
@@ -17,8 +19,11 @@ export const useStore = create((set) => ({
       selectedObject: null,
     };
   }),
+  
   setSelectedObject: (object) => set({ selectedObject: object }),
   setTransformMode: (mode) => set({ transformMode: mode }),
+  setLightIntensity: (intensity) => set({ lightIntensity: intensity }),
+
   updateModelTransform: (instanceId, newPosition, newRotation, newScale) => set((state) => ({
     models: state.models.map(model => 
       model.instanceId === instanceId 

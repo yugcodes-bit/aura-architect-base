@@ -1,4 +1,3 @@
-// src/components/LibraryPanel.jsx
 import React from 'react';
 
 export const LibraryPanel = ({ library, onAddModel, onClose }) => {

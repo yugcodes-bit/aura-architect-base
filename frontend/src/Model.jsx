@@ -1,9 +1,8 @@
 // src/Model.jsx
-
 import { useGLTF } from '@react-three/drei';
 import { useMemo, useRef } from 'react';
 
-export function Model({ modelData, setSelectedObject }) {
+export function Model({ modelData, setSelectedObject, lightIntensity }) {
   const { scene } = useGLTF(modelData.models.file_url);
   const groupRef = useRef();
 
@@ -27,6 +26,7 @@ export function Model({ modelData, setSelectedObject }) {
       userData={{
         instanceId: modelData.instanceId,
         category: modelData.models.category,
+        isLamp: modelData.models.category === 'lamp' // Add the isLamp flag
       }}
       onClick={(e) => {
         e.stopPropagation();
@@ -38,10 +38,11 @@ export function Model({ modelData, setSelectedObject }) {
       }}
     >
       <primitive object={clonedScene} />
+      
       {modelData.models.category === 'lamp' && (
         <pointLight
           color={"#FFDDB3"}
-          intensity={10}
+          intensity={lightIntensity} // Use the intensity from the prop
           distance={7}
           decay={2}
           castShadow

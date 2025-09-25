@@ -1,32 +1,20 @@
 // src/Scene.jsx
-
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, TransformControls } from '@react-three/drei';
 import { Model } from './Model';
 
-export function Scene({ models = [], transformMode, selectedObject, setSelectedObject, onTransformEnd }) {
-  const controlsRef = useRef();
-
-  useEffect(() => {
-    if (controlsRef.current) {
-      const controls = controlsRef.current;
-      
-      const callback = () => {
-        if (onTransformEnd && controls.object) {
-          onTransformEnd(
-            controls.object.userData.instanceId,
-            [controls.object.position.x, controls.object.position.y, controls.object.position.z],
-            [controls.object.rotation.x, controls.object.rotation.y, controls.object.rotation.z],
-            controls.object.scale.x
-          );
-        }
-      };
-      
-      controls.addEventListener('mouseUp', callback);
-      return () => controls.removeEventListener('mouseUp', callback);
+export function Scene({ models = [], transformMode, selectedObject, setSelectedObject, onTransformEnd, lightIntensity }) {
+  const handleMouseUp = () => {
+    if (selectedObject && onTransformEnd) {
+      onTransformEnd(
+        selectedObject.userData.instanceId,
+        [selectedObject.position.x, selectedObject.position.y, selectedObject.position.z],
+        [selectedObject.rotation.x, selectedObject.rotation.y, selectedObject.rotation.z],
+        selectedObject.scale.x
+      );
     }
-  });
+  };
 
   return (
     <Canvas 
@@ -38,13 +26,20 @@ export function Scene({ models = [], transformMode, selectedObject, setSelectedO
       <directionalLight castShadow position={[0, 3, 2]} intensity={1.5} />
       <OrbitControls makeDefault enabled={!selectedObject} />
 
-      <TransformControls ref={controlsRef} object={selectedObject} mode={transformMode} />
+      {selectedObject && 
+        <TransformControls 
+          object={selectedObject} 
+          mode={transformMode} 
+          onMouseUp={handleMouseUp} 
+        />
+      }
 
       {models.map((modelData) => (
         <Model
           key={modelData.instanceId}
           modelData={modelData}
           setSelectedObject={setSelectedObject}
+          lightIntensity={lightIntensity} // Pass the intensity down
         />
       ))}
     </Canvas>
