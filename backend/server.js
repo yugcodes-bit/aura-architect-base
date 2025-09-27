@@ -14,6 +14,10 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // --- GEMINI API ENDPOINT ---
+// Make sure you have the express.json() middleware at the top of your server file
+// app.use(express.json());
+
+
 app.post('/api/generate', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -28,7 +32,7 @@ app.post('/api/generate', async (req, res) => {
             Generate the JSON object.
         `;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent(metaPrompt);
         const response = await result.response;
         let text = response.text();
